@@ -1,4 +1,4 @@
 name: inveffect
-version: '1.1'
+version: '1.2'
 main: net._1necat.effectoninv.Effectoninv
 api-version: '1.21'

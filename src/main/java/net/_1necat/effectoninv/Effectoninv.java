@@ -92,6 +92,24 @@ public class Effectoninv extends JavaPlugin {
                     } else {
                         checkAndRemoveLuckEffect(player);
                     }
+                    // プレイヤーのインベントリの5番目のスロットを取得
+                    ItemStack itemInSlot5 = player.getInventory().getItem(13);
+                    if  (itemInSlot5 != null) {
+                        ItemMeta meta5 = itemInSlot5.getItemMeta();
+                        if (meta5 != null) {
+                            String itemName5 = meta5.getDisplayName();
+                            if (itemInSlot5.getType() == Material.IRON_NUGGET && meta5.hasDisplayName() && itemName5.equals(ChatColor.WHITE + "泡沫")) {
+                                // 水中呼吸3の効果を付与
+                                player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING, Integer.MAX_VALUE, 0, false, false));
+                            } else {
+                                checkAndRemoveWaterBreathingEffect(player);
+                            }
+                        } else {
+                            checkAndRemoveWaterBreathingEffect(player);
+                        }
+                    } else {
+                        checkAndRemoveWaterBreathingEffect(player);
+                    }
                 }
             }
         }.runTaskTimer(this, 0L, 2L); // 1/10秒ごとにチェック
@@ -149,6 +167,19 @@ public class Effectoninv extends JavaPlugin {
         }
     }
 
+    public void checkAndRemoveWaterBreathingEffect(Player player) {
+        PotionEffect waterBreathingEffect = player.getPotionEffect(PotionEffectType.WATER_BREATHING);
+        if (waterBreathingEffect != null) {
+            // エフェクトの持続時間を取得（単位はティック、20ティック＝1秒）
+            int durationTicks = waterBreathingEffect.getDuration();
+            // 30分以上かを確認（30分 = 30 * 60 * 20ティック）
+            int thirtyMinutesInTicks = 30 * 60 * 20;
+            if (durationTicks >= thirtyMinutesInTicks) {
+                player.removePotionEffect(PotionEffectType.WATER_BREATHING);
+            }
+        }
+    }
+
     @Override
     public void onDisable() {
         // プラグインが無効化された際の処理
@@ -158,6 +189,7 @@ public class Effectoninv extends JavaPlugin {
             checkAndRemoveResistanceEffect(player);
             checkAndRemoveStrengthEffect(player);
             checkAndRemoveLuckEffect(player);
+            checkAndRemoveWaterBreathingEffect(player);
         }
     }
 }
